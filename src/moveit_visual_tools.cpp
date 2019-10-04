@@ -1318,11 +1318,15 @@ bool MoveItVisualTools::publishTrajectoryLine(const robot_trajectory::RobotTraje
 
   // Point location datastructure
   EigenSTL::vector_Vector3d path;
+  const Eigen::Isometry3d& base_pose = robot_trajectory.getWayPoint(0).getGlobalLinkTransform(base_frame_);//global link transform for base_frame_ is the same for all trajectory points
 
   // Visualize end effector position of cartesian path
   for (std::size_t i = 0; i < robot_trajectory.getWayPointCount(); ++i)
   {
-    const Eigen::Isometry3d& tip_pose = robot_trajectory.getWayPoint(i).getGlobalLinkTransform(ee_parent_link);
+//    const Eigen::Isometry3d& tip_pose = robot_trajectory.getWayPoint(i).getGlobalLinkTransform(ee_parent_link);
+    const Eigen::Isometry3d& tip_pose2 = robot_trajectory.getWayPoint(i).getGlobalLinkTransform(ee_parent_link);
+
+    const Eigen::Isometry3d& tip_pose = base_pose.inverse() * tip_pose2; //this is now the tips_pose measured in the base_frame_
 
     // Error Check
     if (tip_pose.translation().x() != tip_pose.translation().x())
